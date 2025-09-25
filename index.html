@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduManage Pro - Student Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Global Styles and Variables */
+        :root {
+            --primary-purple: #6a11cb;
+            --secondary-purple: #8338ec;
+            --light-purple: #a855f7;
+            --accent-pink: #ff6b6b;
+            --dark-bg: #1a1a2e;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --text-light: #ffffff;
+            --text-muted: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #16213e 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Effect */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(106, 17, 203, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: var(--text-light);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            padding-top: 6rem;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(106, 17, 203, 0.2);
+        }
+
+        .card-header {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .card-icon {
+            font-size: 1.5rem;
+            color: var(--light-purple);
+        }
+
+        .card-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Grid Layout */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--light-purple);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            color: var(--text-light);
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            background: rgba(106, 17, 203, 0.2);
+            font-weight: 600;
+            color: var(--text-light);
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Chart Containers */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 2rem;
+        }
+
+        /* Role Selection Page */
+        .role-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .role-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .role-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .role-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .role-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--light-purple);
+        }
+
+        .role-name {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .role-description {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(to right, var(--primary-purple), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .container {
+                padding: 1rem;
+                padding-top: 5rem;
+            }
+            
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+            
+            .role-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-value {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center {
+            text-align: center;
+        }
+        
+        .mb-1 {
+            margin-bottom: 1rem;
+        }
+        
+        .mb-2 {
+            margin-bottom: 2rem;
+        }
+        
+        .mt-2 {
+            margin-top: 2rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+            <span>EduManage Pro</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link" onclick="showPage('dashboard')">Dashboard</a>
+            <a href="#" class="nav-link" onclick="showPage('admissions')">Admissions</a>
+            <a href="#" class="nav-link" onclick="showPage('fees')">Fees</a>
+            <a href="#" class="nav-link" onclick="showPage('hostel')">Hostel</a>
+            <a href="#" class="nav-link" onclick="showPage('exams')">Exams</a>
+            <a href="#" class="nav-link" onclick="showPage('library')">Library</a>
+        </div>
+    </nav>
+
+    <!-- Role Selection Page -->
+    <div id="role-selection" class="role-selection page active">
+        <h1 class="role-title">Welcome to EduManage Pro</h1>
+        <p class="text-center mb-2">Please select your role to continue</p>
+        <div class="role-grid">
+            <div class="card role-card glass" onclick="showPage('login')">
+                <i class="fas fa-user-graduate role-icon"></i>
+                <h3 class="role-name">Student</h3>
+                <p class="role-description">Access your academic records, fees, and more</p>
+            </div>
+            <div class="card role-card glass" onclick="showPage('login')">
+                <i class="fas fa-chalkboard-teacher role-icon"></i>
+                <h3 class="role-name">Staff</h3>
+                <p class="role-description">Manage courses, assignments, and student records</p>
+            </div>
+            <div class="card role-card glass" onclick="showPage('login')">
+                <i class="fas fa-user-shield role-icon"></i>
+                <h3 class="role-name">Admin</h3>
+                <p class="role-description">Full system access and management capabilities</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Page -->
+    <div id="login" class="login-container page">
+        <div class="card login-form glass">
+            <h2 class="login-title">Login</h2>
+            <div class="form-group">
+                <label class="form-label" for="username">Username</label>
+                <input type="text" id="username" class="form-input" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input type="password" id="password" class="form-input" placeholder="Enter your password">
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="showPage('dashboard')">Login</button>
+            <p class="text-center mt-2">
+                <a href="#" onclick="showPage('role-selection')" class="btn btn-secondary">Back to Role Selection</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="container page">
+        <h1 class="mb-2">Dashboard Overview</h1>
+        
+        <div class="grid grid-3 mb-2">
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-users card-icon"></i>
+                    <h3 class="card-title">Total Students</h3>
+                </div>
+                <div class="card-value">1,247</div>
+                <p class="card-description">+38 since last month</p>
+            </div>
+            
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-money-bill-wave card-icon"></i>
+                    <h3 class="card-title">Fees Collected</h3>
+                </div>
+                <div class="card-value">$186,420</div>
+                <p class="card-description">92% of expected revenue</p>
+            </div>
+            
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-bed card-icon"></i>
+                    <h3 class="card-title">Hostel Occupancy</h3>
+                </div>
+                <div class="card-value">78%</div>
+                <p class="card-description">342 of 438 rooms occupied</p>
+            </div>
+        </div>
+        
+        <div class="grid grid-2 mb-2">
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-book card-icon"></i>
+                    <h3 class="card-title">Library Records</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="libraryChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-chart-line card-icon"></i>
+                    <h3 class="card-title">Admissions Trend</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="admissionsChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <div class="grid grid-2">
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-home card-icon"></i>
+                    <h3 class="card-title">Hostel Occupancy</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="hostelChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-money-check card-icon"></i>
+                    <h3 class="card-title">Fee Collection</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="feesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admissions Page -->
+    <div id="admissions" class="container page">
+        <h1 class="mb-2">Student Admission Form</h1>
+        
+        <div class="card glass mb-2">
+            <form id="admissionForm">
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="fullName">Full Name</label>
+                        <input type="text" id="fullName" class="form-input" placeholder="Enter student's full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="rollNo">Roll Number</label>
+                        <input type="text" id="rollNo" class="form-input" placeholder="Enter roll number">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input type="email" id="email" class="form-input" placeholder="Enter email address">
+                </div>
+                
+                <div class="grid grid-2">
+                    <div class="form-group">
+                        <label class="form-label" for="department">Department</label>
+                        <select id="department" class="form-select">
+                            <option value="">Select Department</option>
+                            <option value="cs">Computer Science</option>
+                            <option value="ece">Electronics & Communication</option>
+                            <option value="mech">Mechanical Engineering</option>
+                            <option value="civil">Civil Engineering</option>
+                            <option value="mba">Business Administration</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="course">Course</label>
+                        <select id="course" class="form-select">
+                            <option value="">Select Course</option>
+                            <option value="btech">B.Tech</option>
+                            <option value="mtech">M.Tech</option>
+                            <option value="bca">BCA</option>
+                            <option value="mca">MCA</option>
+                            <option value="bba">BBA</option>
+                            <option value="mba">MBA</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="year">Academic Year</label>
+                    <select id="year" class="form-select">
+                        <option value="">Select Year</option>
+                        <option value="1">First Year</option>
+                        <option value="2">Second Year</option>
+                        <option value="3">Third Year</option>
+                        <option value="4">Fourth Year</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="photo">Upload Photo</label>
+                    <input type="file" id="photo" class="form-input" accept="image/*">
+                    <p class="card-description">Max file size: 2MB. Formats: JPG, PNG</p>
+                </div>
+                
+                <button type="button" class="btn btn-primary">Submit Admission</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Fees Management Page -->
+    <div id="fees" class="container page">
+        <h1 class="mb-2">Fee Management</h1>
+        
+        <div class="card glass mb-2">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Course</th>
+                            <th>Fee Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>S001</td>
+                            <td>John Smith</td>
+                            <td>B.Tech CS</td>
+                            <td>$1,200</td>
+                            <td>15 Oct 2023</td>
+                            <td><span style="color: var(--accent-pink);">Pending</span></td>
+                            <td><button class="btn btn-primary">Pay Now</button></td>
+                        </tr>
+                        <tr>
+                            <td>S002</td>
+                            <td>Emma Johnson</td>
+                            <td>MBA</td>
+                            <td>$1,500</td>
+                            <td>12 Oct 2023</td>
+                            <td><span style="color: var(--success);">Paid</span></td>
+                            <td><button class="btn btn-secondary">Receipt</button></td>
+                        </tr>
+                        <tr>
+                            <td>S003</td>
+                            <td>Michael Brown</td>
+                            <td>B.Tech ECE</td>
+                            <td>$1,200</td>
+                            <td>18 Oct 2023</td>
+                            <td><span style="color: var(--accent-pink);">Pending</span></td>
+                            <td><button class="btn btn-primary">Pay Now</button></td>
+                        </tr>
+                        <tr>
+                            <td>S004</td>
+                            <td>Sarah Williams</td>
+                            <td>MCA</td>
+                            <td>$1,300</td>
+                            <td>05 Oct 2023</td>
+                            <td><span style="color: var(--success);">Paid</span></td>
+                            <td><button class="btn btn-secondary">Receipt</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card glass">
+            <h3 class="card-title mb-1">Generate Receipt</h3>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="receiptStudent">Student ID</label>
+                    <input type="text" id="receiptStudent" class="form-input" placeholder="Enter Student ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="receiptAmount">Amount</label>
+                    <input type="text" id="receiptAmount" class="form-input" placeholder="Enter amount">
+                </div>
+            </div>
+            <button class="btn btn-primary">Generate & Download Receipt</button>
+        </div>
+    </div>
+
+    <!-- Hostel Management Page -->
+    <div id="hostel" class="container page">
+        <h1 class="mb-2">Hostel Management</h1>
+        
+        <div class="card glass mb-2">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Block</th>
+                            <th>Room No</th>
+                            <th>Capacity</th>
+                            <th>Occupied</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>A</td>
+                            <td>101</td>
+                            <td>2</td>
+                            <td>2</td>
+                            <td><span style="color: var(--success);">Full</span></td>
+                            <td><button class="btn btn-secondary">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>A</td>
+                            <td>102</td>
+                            <td>2</td>
+                            <td>1</td>
+                            <td><span style="color: var(--warning);">Available</span></td>
+                            <td><button class="btn btn-primary">Allocate</button></td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>201</td>
+                            <td>3</td>
+                            <td>2</td>
+                            <td><span style="color: var(--warning);">Available</span></td>
+                            <td><button class="btn btn-primary">Allocate</button></td>
+                        </tr>
+                        <tr>
+                            <td>B</td>
+                            <td>202</td>
+                            <td>3</td>
+                            <td>3</td>
+                            <td><span style="color: var(--success);">Full</span></td>
+                            <td><button class="btn btn-secondary">View</button></td>
+                        </tr>
+                        <tr>
+                            <td>C</td>
+                            <td>301</td>
+                            <td>2</td>
+                            <td>0</td>
+                            <td><span style="color: var(--warning);">Available</span></td>
+                            <td><button class="btn btn-primary">Allocate</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card glass">
+            <h3 class="card-title mb-1">Allocate Room</h3>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="allocateStudent">Student ID</label>
+                    <input type="text" id="allocateStudent" class="form-input" placeholder="Enter Student ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="allocateRoom">Room No</label>
+                    <input type="text" id="allocateRoom" class="form-input" placeholder="Enter Room No">
+                </div>
+            </div>
+            <button class="btn btn-primary">Allocate Room</button>
+        </div>
+    </div>
+
+    <!-- Examination Page -->
+    <div id="exams" class="container page">
+        <h1 class="mb-2">Examination Records</h1>
+        
+        <div class="card glass mb-2">
+            <h3 class="card-title mb-1">Enter Student Marks</h3>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="examStudent">Student ID</label>
+                    <input type="text" id="examStudent" class="form-input" placeholder="Enter Student ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="examSubject">Subject</label>
+                    <select id="examSubject" class="form-select">
+                        <option value="">Select Subject</option>
+                        <option value="math">Mathematics</option>
+                        <option value="physics">Physics</option>
+                        <option value="chemistry">Chemistry</option>
+                        <option value="programming">Programming</option>
+                        <option value="database">Database Systems</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="examMarks">Marks Obtained</label>
+                    <input type="number" id="examMarks" class="form-input" placeholder="Enter marks" min="0" max="100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="examTotal">Total Marks</label>
+                    <input type="number" id="examTotal" class="form-input" placeholder="Total marks" value="100" readonly>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary">Submit Marks</button>
+        </div>
+        
+        <div class="card glass">
+            <h3 class="card-title mb-1">Student Results</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Name</th>
+                            <th>Subject</th>
+                            <th>Marks Obtained</th>
+                            <th>Total Marks</th>
+                            <th>Percentage</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>S001</td>
+                            <td>John Smith</td>
+                            <td>Mathematics</td>
+                            <td>85</td>
+                            <td>100</td>
+                            <td>85%</td>
+                            <td>A</td>
+                        </tr>
+                        <tr>
+                            <td>S002</td>
+                            <td>Emma Johnson</td>
+                            <td>Physics</td>
+                            <td>92</td>
+                            <td>100</td>
+                            <td>92%</td>
+                            <td>A+</td>
+                        </tr>
+                        <tr>
+                            <td>S003</td>
+                            <td>Michael Brown</td>
+                            <td>Programming</td>
+                            <td>78</td>
+                            <td>100</td>
+                            <td>78%</td>
+                            <td>B+</td>
+                        </tr>
+                        <tr>
+                            <td>S004</td>
+                            <td>Sarah Williams</td>
+                            <td>Database Systems</td>
+                            <td>88</td>
+                            <td>100</td>
+                            <td>88%</td>
+                            <td>A</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Library Page -->
+    <div id="library" class="container page">
+        <h1 class="mb-2">Library Management</h1>
+        
+        <div class="grid grid-2 mb-2">
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-book-open card-icon"></i>
+                    <h3 class="card-title">Total Books</h3>
+                </div>
+                <div class="card-value">12,584</div>
+                <p class="card-description">+243 new books this year</p>
+            </div>
+            
+            <div class="card glass">
+                <div class="card-header">
+                    <i class="fas fa-users card-icon"></i>
+                    <h3 class="card-title">Active Members</h3>
+                </div>
+                <div class="card-value">987</div>
+                <p class="card-description">82% of total students</p>
+            </div>
+        </div>
+        
+        <div class="card glass mb-2">
+            <h3 class="card-title mb-1">Book Issue Records</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Book ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Issued To</th>
+                            <th>Issue Date</th>
+                            <th>Return Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>B001</td>
+                            <td>Introduction to Algorithms</td>
+                            <td>Cormen</td>
+                            <td>S001 (John Smith)</td>
+                            <td>01 Sep 2023</td>
+                            <td>15 Sep 2023</td>
+                            <td><span style="color: var(--success);">Returned</span></td>
+                        </tr>
+                        <tr>
+                            <td>B002</td>
+                            <td>Database System Concepts</td>
+                            <td>Silberschatz</td>
+                            <td>S003 (Michael Brown)</td>
+                            <td>10 Sep 2023</td>
+                            <td>25 Sep 2023</td>
+                            <td><span style="color: var(--accent-pink);">Overdue</span></td>
+                        </tr>
+                        <tr>
+                            <td>B003</td>
+                            <td>Computer Networks</td>
+                            <td>Tanenbaum</td>
+                            <td>S002 (Emma Johnson)</td>
+                            <td>15 Sep 2023</td>
+                            <td>30 Sep 2023</td>
+                            <td><span style="color: var(--warning);">Issued</span></td>
+                        </tr>
+                        <tr>
+                            <td>B004</td>
+                            <td>Artificial Intelligence</td>
+                            <td>Russell</td>
+                            <td>S004 (Sarah Williams)</td>
+                            <td>20 Sep 2023</td>
+                            <td>05 Oct 2023</td>
+                            <td><span style="color: var(--warning);">Issued</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card glass">
+            <h3 class="card-title mb-1">Issue New Book</h3>
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label class="form-label" for="bookStudent">Student ID</label>
+                    <input type="text" id="bookStudent" class="form-input" placeholder="Enter Student ID">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="bookID">Book ID</label>
+                    <input type="text" id="bookID" class="form-input" placeholder="Enter Book ID">
+                </div>
+            </div>
+            <button class="btn btn-primary">Issue Book</button>
+        </div>
+    </div>
+
+    <script>
+        // Page navigation function
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Show the selected page
+            document.getElementById(pageId).classList.add('active');
+            
+            // If showing dashboard, initialize charts
+            if (pageId === 'dashboard') {
+                initCharts();
+            }
+        }
+
+        // Initialize charts on dashboard
+        function initCharts() {
+            // Library Usage Chart (Pie)
+            const libraryCtx = document.getElementById('libraryChart').getContext('2d');
+            new Chart(libraryCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Computer Science', 'Engineering', 'Business', 'Mathematics', 'Literature'],
+                    datasets: [{
+                        data: [35, 25, 20, 15, 5],
+                        backgroundColor: [
+                            '#6a11cb', '#8338ec', '#a855f7', '#c084fc', '#e9d5ff'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Admissions Trend Chart (Line)
+            const admissionsCtx = document.getElementById('admissionsChart').getContext('2d');
+            new Chart(admissionsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [{
+                        label: 'New Admissions',
+                        data: [65, 79, 90, 81, 56, 55, 40, 78, 93],
+                        borderColor: '#6a11cb',
+                        backgroundColor: 'rgba(106, 17, 203, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Hostel Occupancy Chart (Doughnut)
+            const hostelCtx = document.getElementById('hostelChart').getContext('2d');
+            new Chart(hostelCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Occupied', 'Available'],
+                    datasets: [{
+                        data: [78, 22],
+                        backgroundColor: [
+                            '#6a11cb', '#3730a3'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#fff',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Fees Collection Chart (Bar)
+            const feesCtx = document.getElementById('feesChart').getContext('2d');
+            new Chart(feesCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    datasets: [{
+                        label: 'Fees Collected ($)',
+                        data: [12500, 14500, 16800, 15200, 17400, 18600, 19200, 21000, 18600],
+                        backgroundColor: '#a855f7',
+                        borderWidth: 0,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#cbd5e1'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Start with role selection page
+            showPage('role-selection');
+        });
+    </script>
+</body>
+</html>
